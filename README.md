@@ -22,7 +22,7 @@ But you want your repository to look like this:
 
 Then this is your script.
 
-This script can also help teams trying to accept pull requests
+This script can also help teams trying to work with pull requests
 from Merlin the Magician or Benjamin Button.
 
 ## Example Usage
