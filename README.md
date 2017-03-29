@@ -2,7 +2,7 @@
 Bash 4.x script to reverse a git repo.
 
 ## Compatibility
-Doesn't work on Mac OS X (Bash 3.x).  Only tested on Ubuntu 16.04.  YMMV.
+Usually fails on Mac OS X (Bash 3.x).  Tested on Ubuntu 16.04.  YMMV.
 
 ## License
 BSD-2
