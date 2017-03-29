@@ -74,11 +74,13 @@ You have a full 'git clone --mirror' backup stored somewhere safe, right?
    
 **2. I tried to use this script to repair a repository corrupted by this script, and it worked, but all my commit-ids changed. Can you fix this?**
 
-   Send me a PR with the fix and I'll happily merge it! I suspect whitespace might be getting messed up in the metadata during the reversal, and so the commit-ids get perturbed. After 1 cycle of `git-reverse.sh` the commit-ids stabilize for all subsequent cycles, so there is some hope that this might be fixable.
+   Send me a PR with the fix and I'll happily merge it. I suspect whitespace might be getting messed up in the metadata during the reversal, and so the commit-ids get perturbed. After 1 cycle of `git-reverse.sh` the commit-ids stabilize for all subsequent cycles, so there is some hope that this might be fixable.
    
-**3. I tried to reverse https://github.com/git/git, but it just hangs after processing about 70,000 commits. What's going wrong?**
+   Also, my script ignores anything in a commit message past the 30,000th character. That also causes that commit-id to change, as well as all subsequent commit-id's.  I'd welcome a PR that fixes that. We need to use a temporary file to hold the commit message to get around maximum command-length limitations, but I could not be bothered.
+   
+**3. I tried to reverse https://github.com/git/git, but it just hangs after processing 76,173 commits. What's going wrong?**
 
-   For some reason the "git commit-tree" call hangs after about 70,000 invocations with that repo. I wonder if maybe git is doing some cleanup behind the scenes, and since all the commits reversed so far are unreachable (they have no refs pointing to them until later in the script), things get into a mess.
+   For some reason the "git commit-tree" invocation hangs at that point.  I have no idea why.
 
 **4. My repo has a few orphan commits (aka root commits), and they are gone after the reversal. Where are they?**
 
