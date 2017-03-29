@@ -77,7 +77,7 @@ You have a full 'git clone --mirror' backup stored somewhere safe, right?
 
    Send me a PR with the fix and I'll happily merge it. I suspect whitespace might be getting messed up in the metadata during the reversal, and so the commit-ids get perturbed. After 1 cycle of `git-reverse.sh` the commit-ids stabilize for all subsequent cycles, so there is some hope that this might be fixable.
    
-   Also, my script ignores anything in a commit message past the 30,000th character. That also causes that commit-id to change, as well as all subsequent commit-id's.  I'd welcome a PR that fixes that. We need to use a temporary file to hold the commit message to get around maximum command-length limitations, but I could not be bothered.
+   Also, my script ignores anything in a commit message past the 30,000th character. That also causes that commit-id to change, as well as all subsequent commit-id's.  I'd welcome a PR that fixes that. We need to use a temporary file to hold the commit message to get around maximum command-length limitations.
    
 **3. I tried to reverse https://github.com/git/git, but it just hangs after processing 76,173 commits. What's going wrong?**
 
