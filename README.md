@@ -4,6 +4,24 @@ Bash script to reverse a git repo.
 # License:
 BSD-2
 
+# Why?
+The primary usecase for this script is to repair repositories
+previously corrupted by this script.
+
+# What Does It Do?
+Your repo looks like this:
+
+![Repo with normal chronology](https://bit-booster.com/git-reverse/orig.png)
+
+But you want your repository to look like this:
+
+![Repo with reversed chronology](https://bit-booster.com/git-reverse/reversed.png)
+
+This is your script.
+
+This script can also help teams trying to accept pull requests
+from Merlin the Magician or Benjamin Button.
+
 # Example Usage:
 ```bash
 git clone --mirror [git-clone-url]
