@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # git-reverse.sh
-# Bash 4.x script to reverse a git repo.
+# Bash script to reverse a git repo.
 # https://bit-booster.com/doing-git-wrong/2017/03/30/howto-reverse-a-git-repo/
 #
 # DOES NOT WORK ON MAC OS X (BASH 3.X)
@@ -50,10 +50,10 @@ COUNT=0
 # Store new parent relationships as deferred lookups against the ${C} hash.
 # e.g. P[c336a17dadc6ff094fc92687ee0679e9628ec69c] = "-p ${C[a7fa63fe4cb5fb6b745588005e2af8184c650b43]}"
 eval "$(git log --all --date-order --pretty='
-  export PARENTS="%P";
-  for p in $PARENTS; do
-    P[$p]="${P[$p]} -p \${C[%H]}";
-  done'
+export PARENTS="%P";
+for p in $PARENTS; do
+  P[$p]="${P[$p]} -p \${C[%H]}";
+done'
 )"
 
 # Here's the meat of the operation.
@@ -77,15 +77,18 @@ export GIT_COMMITTER_EMAIL="${AR[4]}"
 export GIT_COMMITTER_NAME="${AR[5]}"
 export GIT_COMMIT_MSG
 GIT_COMMIT_MSG="$(head --bytes=30000<<'"'"BB_EOM"'"'%n%B%nBB_EOM%n)"
-%nexport GIT_LAST_COMMIT=$(git commit-tree -m "$GIT_COMMIT_MSG" $(eval echo ${P[%H]}) %T)
-%nC[%H]=$GIT_LAST_COMMIT
-%necho "$GIT_LAST_COMMIT - Reversed $((++COUNT)) of $TOTAL ($((100 * COUNT / TOTAL))%%)"
+export GIT_LAST_COMMIT=$(git commit-tree -m "$GIT_COMMIT_MSG" $(eval echo ${P[%H]}) %T)
+C[%H]=$GIT_LAST_COMMIT
+git branch -f bb_reverse $GIT_LAST_COMMIT
+echo "$GIT_LAST_COMMIT - Reversed $((++COUNT)) of $TOTAL ($((100 * COUNT / TOTAL))%%)"
 ')"
+
+git branch -D bb_reverse
 
 # Need to get off 'master' branch before we force-update all branches.
 # (But don't blow up if in a bare repo).
 set +e
-git checkout $(git log -1 --pretty=%H)
+git checkout $(git log -1 --pretty=%H) &> /dev/null
 set -e
 
 eval "$(git for-each-ref refs/heads --shell --format='
@@ -99,7 +102,7 @@ eval "$(git for-each-ref refs/tags --shell --format='
 git branch -f master $GIT_LAST_COMMIT
 
 set +e
-git checkout master
+git checkout master &> /dev/null
 set -e
 
 echo ""
@@ -108,7 +111,8 @@ echo "| Git repo successfully reversed!!! :-) (-: |"
 echo "*********************************************"
 echo "To push the reversed repo:"
 echo "  rm .git/packed-refs "
-echo "  git push --mirror   "
+echo "  rm -rf .git/refs/remotes "
+echo "  git push --mirror [git-reversed-clone-url]  "
 echo ""
 echo "WARNING:"
 echo "========"
