@@ -15,11 +15,11 @@ The primary usecase for this script is to repair repositories
 previously corrupted by this script.
 
 ## What Does It Do?
-If your repo looks like this:
+If your repo looks like [this](http://vm.bit-booster.com/bitbucket/plugins/servlet/bb_net/projects/BB/repos/jack/commits):
 
 ![Repo with normal chronology](https://bit-booster.com/git-reverse/orig.png)
 
-But you want your repository to look like this:
+But you want your repository to look like [this](http://vm.bit-booster.com/bitbucket/plugins/servlet/bb_net/projects/BB/repos/jack_reversed/commits):
 
 ![Repo with reversed chronology](https://bit-booster.com/git-reverse/reversed.png)
 
