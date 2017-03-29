@@ -34,6 +34,7 @@ from [Merlin the Magician](https://en.wikipedia.org/wiki/Merlin) or [Benjamin Bu
 git clone --mirror [git-clone-url]
 cd [repo.git]
 ./git-reverse.sh
+git log --all --date-order --graph --decorate
 ```
 
 ## Example Output
