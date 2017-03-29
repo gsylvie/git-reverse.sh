@@ -1,11 +1,11 @@
 # git-reverse.sh
-Bash 4.x script to reverse a git repo.
+Bash 4 script reverses a git repo.
 
-More info on the Bit-Booster blog: [Doing Git Wrong](https://bit-booster.com/doing-git-wrong/2017/03/30/howto-reverse-a-git-repo/)
+More info on my blog: [Doing Git Wrong](https://bit-booster.com/doing-git-wrong/2017/03/30/howto-reverse-a-git-repo/)
 
 
 ## Compatibility
-Usually fails on Mac OS X (Bash 3.x).  Tested on Ubuntu 16.04.  YMMV.
+Should fail on Mac OS X (Bash 3).  Tested on Ubuntu 16.04.  YMMV.
 
 ## License
 BSD-2
@@ -14,8 +14,15 @@ BSD-2
 The primary usecase for this script is to repair repositories
 previously corrupted by this script.
 
+I considered using this script to prank my colleagues for April Fool's, but I chickened out.
+
+I actually own a real live chicken (a white silkie), and she also chickened out.
+
 ## What Does It Do?
-If your repo looks like [this](http://vm.bit-booster.com/bitbucket/plugins/servlet/bb_net/projects/BB/repos/jack/commits):
+
+It reverses the direction of every edge in your git repository's DAG (directed acyclic commit graph).
+
+In other words, if your repo looks like [this](http://vm.bit-booster.com/bitbucket/plugins/servlet/bb_net/projects/BB/repos/jack/commits):
 
 ![Repo with normal chronology](https://bit-booster.com/git-reverse/orig.png)
 
@@ -23,7 +30,7 @@ But you want your repository to look like [this](http://vm.bit-booster.com/bitbu
 
 ![Repo with reversed chronology](https://bit-booster.com/git-reverse/reversed.png)
 
-Then this is your script.
+Then this is the script for you.
 
 This script can also help teams trying to work with pull requests
 from [Merlin the Magician](https://en.wikipedia.org/wiki/Merlin) or [Benjamin Button](https://blog.pinboard.in/2016/10/benjamin_button_reviews_the_new_macbook_pro/).
@@ -54,8 +61,9 @@ and have 199 and 159 different commits each, respectively.
 | Git repo successfully reversed!!! :-) (-: |
 *********************************************
 To push the reversed repo:
-  rm .git/packed-refs 
-  git push --mirror   
+  rm .git/packed-refs
+  rm -rf .git/refs/remotes
+  git push --mirror [new-git-clone-url]  
 
 WARNING:
 ========
@@ -75,10 +83,13 @@ You have a full 'git clone --mirror' backup stored somewhere safe, right?
    Send me a PR with the fix and I'll happily merge it! I suspect whitespace might be getting messed up in the metadata during the reversal, and so the commit-ids get perturbed.
    After 1 cycle of `git-reverse.sh` the commit-ids stabilize for all subsequent cycles, so there is some hope that this might be fixable.
    
-**3. I tried to reverse https://github.com/git/git, but it just hangs after processing about 70,000 commits. Can you fix this?**
+**3. I tried to reverse https://github.com/git/git, but it just hangs after processing about 70,000 commits. What's going wrong?**
 
-   Yes, for some reason the "git commit-tree" call hangs around then. I wonder if maybe git is doing some cleanup behind the scenes, and since all the commits reversed so far are unreachable (they have no references until later in the script), things get into a mess.
-   
-**4. Those commit graphs above are so pretty!  Where can I get those for my git repositories?**
+   For some reason the "git commit-tree" call hangs after about 70,000 invocations with that repo. I wonder if maybe git is doing some cleanup behind the scenes, and since all the commits reversed so far are unreachable (they have no refs pointing to them until later in the script), things get into a mess.
+
+**4. My repo has a few orphan commits (aka root commits), and they are gone after the reversal. Where are they?**
+
+
+**5. Those commit graphs above are so pretty!  Where can I get those for my git repositories?**
 
    They come from [Bit-Booster for Bitbucket Server](https://marketplace.atlassian.com/plugins/com.bit-booster.bb/server/overview), my paid add-on for Bitbucket Server (the on-premises version of Bitbucket that can't handle mercurial repos and is written in Java instead of Python).
