@@ -82,8 +82,11 @@ You have a full 'git clone --mirror' backup stored somewhere safe, right?
 
 **4. My repo has a few orphan commits (aka root commits), and they are gone after the reversal. Where are they?**
 
-   They're gone.  They become tip commits after the reversal.  And tip commits without tags or branches pointing at them are not long for this world.
-   If you happen to know years in advance that you will one day reverse your repo, you can employ the [Always Start With An Empty Commit](https://bit-booster.com/doing-git-wrong/2017/01/02/git-init-empty/) remedy. Or, alternatively, just before invoking the script, throw some tag or branch labels at all your root commits. The script carefully preserves all tags and branches, so this is a good way to save these orphans. The one exception is your oldest orphan. The script automatically makes your oldest orphan the new "master" branch after the reversal.
+   They're gone.  They become tip commits after the reversal.  And tip commits without tags or branches pointing at them are not long for this world.
+   
+   If you happen to know years in advance that you will one day reverse your repo, you can employ the [Always Start With An Empty Commit](https://bit-booster.com/doing-git-wrong/2017/01/02/git-init-empty/) remedy. Or, alternatively, just before invoking the script, throw some tag or branch labels at all your root commits. The script carefully preserves all tags and branches, so this is a good way to save these orphans.
+   
+   The one exception is your oldest orphan. The script automatically makes your oldest orphan the new "master" branch after the reversal.
    
 **5. My repo uses "develop" as its default branch, but the reversed repo seems to be using "master" instead. This makes me very upset. Is there anything I can do about this?**
 
