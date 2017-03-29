@@ -1,5 +1,8 @@
 # git-reverse.sh
-Bash script to reverse a git repo.
+Bash 4.x script to reverse a git repo.
+
+# Compatibility:
+Doesn't work on Mac OS X (Bash 3.x).  Only tested on Ubunty 16.04.  YMMV.
 
 # License:
 BSD-2
