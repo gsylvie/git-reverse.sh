@@ -80,7 +80,7 @@ You have a full 'git clone --mirror' backup stored somewhere safe, right?
    
 **3. I tried to reverse https://github.com/git/git, but it just hangs after processing 76,173 commits. What's going wrong?**
 
-   For some reason the "git commit-tree" invocation hangs at that point.  I have no idea why.
+   For some reason the "git commit-tree" invocation hangs at that point.  I have no idea why.  Same for Atlassian's aui repo (after commit 14,378). But I was able to reverse [node.git](http://vm.bit-booster.com/bitbucket/projects/BB/repos/node_reversed/commits).  I've only tested with Git 2.7.4.  Maybe a different git version would fix this. But I really have no idea.
 
 **4. My repo has a few orphan commits (aka root commits), and they are gone after the reversal. Where are they?**
 
