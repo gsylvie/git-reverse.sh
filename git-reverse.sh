@@ -1,8 +1,11 @@
 #!/bin/bash
 
 # git-reverse.sh
-# Bash script to reverse a git repo.
+# Bash 4.x script to reverse a git repo.
 # https://bit-booster.com/doing-git-wrong/2017/03/30/howto-reverse-a-git-repo/
+#
+# DOES NOT WORK ON MAC OS X (BASH 3.X)
+# THIS SCRIPT REQUIRES BASH 4.X ASSOCIATIVE ARRAYS
 #
 # YMMV - I only tested this on Ubuntu 16.04.
 
