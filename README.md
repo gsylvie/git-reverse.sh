@@ -26,7 +26,7 @@ But you want your repository to look like [this](http://vm.bit-booster.com/bitbu
 Then this is your script.
 
 This script can also help teams trying to work with pull requests
-from Merlin the Magician or Benjamin Button.
+from [Merlin the Magician](https://en.wikipedia.org/wiki/Merlin) or [Benjamin Button](https://blog.pinboard.in/2016/10/benjamin_button_reviews_the_new_macbook_pro/).
 
 ## Example Usage
 ```bash
