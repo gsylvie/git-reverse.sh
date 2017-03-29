@@ -1,9 +1,6 @@
 # git-reverse.sh
 Bash 4 script reverses a git repo.
 
-More info on my blog: [Doing Git Wrong](https://bit-booster.com/doing-git-wrong/2017/03/30/howto-reverse-a-git-repo/)
-
-
 ## Compatibility
 Should fail on Mac OS X (Bash 3).  Tested on Ubuntu 16.04.  YMMV.
 
@@ -26,11 +23,9 @@ In other words, if your repo looks like [this](http://vm.bit-booster.com/bitbuck
 
 ![Repo with normal chronology](https://bit-booster.com/git-reverse/orig.png)
 
-But you want your repository to look like [this](http://vm.bit-booster.com/bitbucket/plugins/servlet/bb_net/projects/BB/repos/jack_reversed/commits):
+Run the script against to make your repo look like [this](http://vm.bit-booster.com/bitbucket/plugins/servlet/bb_net/projects/BB/repos/jack_reversed/commits):
 
 ![Repo with reversed chronology](https://bit-booster.com/git-reverse/reversed.png)
-
-Then this is the script for you.
 
 This script can also help teams trying to work with pull requests
 from [Merlin the Magician](https://en.wikipedia.org/wiki/Merlin) or [Benjamin Button](https://blog.pinboard.in/2016/10/benjamin_button_reviews_the_new_macbook_pro/).
@@ -80,8 +75,7 @@ You have a full 'git clone --mirror' backup stored somewhere safe, right?
    
 **2. I tried to use this script to repair a repository corrupted by this script, and it worked, but all my commit-ids changed. Can you fix this?**
 
-   Send me a PR with the fix and I'll happily merge it! I suspect whitespace might be getting messed up in the metadata during the reversal, and so the commit-ids get perturbed.
-   After 1 cycle of `git-reverse.sh` the commit-ids stabilize for all subsequent cycles, so there is some hope that this might be fixable.
+   Send me a PR with the fix and I'll happily merge it! I suspect whitespace might be getting messed up in the metadata during the reversal, and so the commit-ids get perturbed. After 1 cycle of `git-reverse.sh` the commit-ids stabilize for all subsequent cycles, so there is some hope that this might be fixable.
    
 **3. I tried to reverse https://github.com/git/git, but it just hangs after processing about 70,000 commits. What's going wrong?**
 
@@ -89,7 +83,15 @@ You have a full 'git clone --mirror' backup stored somewhere safe, right?
 
 **4. My repo has a few orphan commits (aka root commits), and they are gone after the reversal. Where are they?**
 
+   They're gone.  They become tip commits after the reversal.  And tip commits without tags or branches pointing at them are not long for this world.
+   If you happen to know years in advance that you plan to eventually reverse your repo, you can employ the [Always Start With An Empty Commit](https://bit-booster.com/doing-git-wrong/2017/01/02/git-init-empty/) remedy. Or, alternatively, just before invoking the script, throw some tag or branch labels at all your root commits. The script carefully preserves all tags and branches, so this is a good way to save these orphans. The one exception is your oldest orphan. The script automatically makes that the new "master" branch.
+   
+**5. My repo uses "develop" as its default branch, but the reversed repo seems to be using "master" instead. This makes me very upset. Is there anything I can do about this?**
 
-**5. Those commit graphs above are so pretty!  Where can I get those for my git repositories?**
+   After the reversal completes, try `git push origin master:refs/heads/develop`.
+   
+   Sorry, there's no good way for my script to auto-detect the default branch.
+
+**6. Those commit graphs above are so pretty!  Where can I get those for my git repositories?**
 
    They come from [Bit-Booster for Bitbucket Server](https://marketplace.atlassian.com/plugins/com.bit-booster.bb/server/overview), my paid add-on for Bitbucket Server (the on-premises version of Bitbucket that can't handle mercurial repos and is written in Java instead of Python).
