@@ -1,10 +1,10 @@
 # git-reverse.sh
 Bash 4.x script to reverse a git repo.
 
-## Compatibility:
-Doesn't work on Mac OS X (Bash 3.x).  Only tested on Ubunty 16.04.  YMMV.
+## Compatibility
+Doesn't work on Mac OS X (Bash 3.x).  Only tested on Ubuntu 16.04.  YMMV.
 
-## License:
+## License
 BSD-2
 
 ## Why?
@@ -25,14 +25,14 @@ This is your script.
 This script can also help teams trying to accept pull requests
 from Merlin the Magician or Benjamin Button.
 
-## Example Usage:
+## Example Usage
 ```bash
 git clone --mirror [git-clone-url]
 cd [repo.git]
 ./git-reverse.sh
 ```
 
-## Example Output:
+## Example Output
 ```bash
 $ ./git-reverse.sh 
 be0923ece8f73281e5e54906c29debb852894b92 - Reversed 1 of 360 (0%)
