@@ -5,11 +5,13 @@ Bash script to reverse a git repo.
 BSD-2
 
 # Example Usage:
+```bash
 git clone --mirror [git-clone-url]
 cd [repo.git]
 ./git-reverse.sh
+```
 
-# Output
+# Example Output:
 ```bash
 $ ./git-reverse.sh 
 be0923ece8f73281e5e54906c29debb852894b92 - Reversed 1 of 360 (0%)
