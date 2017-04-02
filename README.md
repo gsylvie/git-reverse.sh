@@ -101,4 +101,4 @@ You have a full 'git clone --mirror' backup stored somewhere safe, right?
 
    They come from [Bit-Booster for Bitbucket Server](https://marketplace.atlassian.com/plugins/com.bit-booster.bb/server/overview), my paid add-on for Bitbucket Server (the on-premises version of Bitbucket that can't handle mercurial repos and is written in Java instead of Python).
 
-   Feel free to click around some more on my [demo server](http://vm.bit-booster.com/bitbucket). And feel free to write your own Atlassian add-ons.  It's lots of fun, and somewhat lucrative. I've earned $4,800 USD through [marketplace.atlassian.com](https://marketplace.atlassian.com/) since I started [Bit-Booster](https://marketplace.atlassian.com/plugins/com.bit-booster.bb/server/overview) 12 months ago.
+   Feel free to click around some more on my [demo server](http://vm.bit-booster.com/bitbucket). And feel free to write your own Atlassian add-ons.  It's lots of fun, and somewhat lucrative.
