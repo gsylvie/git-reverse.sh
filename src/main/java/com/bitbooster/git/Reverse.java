@@ -137,19 +137,20 @@ public class Reverse {
 
         cmd = new String[]{"git", "log", "--all", "--date-order", "--pretty=" + PATTERN};
         exec(cmd, reverser);
+        processCommitData(currentTokLine, currentBody, m, h2h);
 
         // Need to get off 'master' branch before we force-update all branches.
         cmd = new String[]{"git", "checkout", FINAL_COMMIT};
         exec(cmd, null);
 
         LineProcessor branchRewriter = line -> {
-            String[] toks = line.split("|");
+            String[] toks = line.split("\\|");
             String ref = toks[0];
             String id = toks[1];
-            String rewritten = h2h.get(id.trim());
-            rewritten = rewritten.trim();
-            String[] forceBranch = new String[]{"git", "branch", "-f", ref, rewritten};
             try {
+                String rewritten = h2h.get(id.trim());
+                rewritten = rewritten.trim();
+                String[] forceBranch = new String[]{"git", "branch", "-f", ref, rewritten};
                 exec(forceBranch, null, null);
             } catch (Exception e) {
                 throw new RuntimeException("git branch -f " + ref + " (rewritten:" + id + ") failed: " + e, e);
@@ -157,13 +158,13 @@ public class Reverse {
         };
 
         LineProcessor tagRewriter = line -> {
-            String[] toks = line.split("|");
+            String[] toks = line.split("\\|");
             String ref = toks[0];
             String id = toks[1];
-            String rewritten = h2h.get(id.trim());
-            rewritten = rewritten.trim();
-            String[] forceTag = new String[]{"git", "tag", "-f", ref, rewritten};
             try {
+                String rewritten = h2h.get(id.trim());
+                rewritten = rewritten.trim();
+                String[] forceTag = new String[]{"git", "tag", "-f", ref, rewritten};
                 exec(forceTag, null, null);
             } catch (Exception e) {
                 throw new RuntimeException("git tag -f " + ref + " (rewritten:" + id + ") failed: " + e, e);
@@ -217,7 +218,7 @@ public class Reverse {
 
     private static Run exec(String[] args, String[] env, LineProcessor lp) throws Exception {
 
-        // System.out.println(Arrays.toString(args).replace(",", ""));
+        String cmd = Arrays.toString(args).replace(",", "");
 
         final Process p = Runtime.getRuntime().exec(args, env);
         final InputStream stdout = p.getInputStream();
@@ -230,11 +231,17 @@ public class Reverse {
         Future<StringBuilder> f2 = POOL.submit(readStdErr, err);
         readStdOut.run();
         f2.get();
-        p.waitFor();
+        int exitCode = p.waitFor();
 
         Run r = new Run();
-        r.stdout = out.toString();
-        r.stderr = err.toString();
+        r.stdout = out.toString().trim();
+        r.stderr = err.toString().trim();
+        if (exitCode != 0 || !"".equals(r.stderr.trim())) {
+            System.out.println("----------------------------------------------");
+            System.out.println("exit=" + exitCode + " for: " + cmd);
+            System.out.println("stdout=[" + r.stdout + "]");
+            System.out.println("stderr=[" + r.stderr + "]");
+        }
         return r;
     }
 
