@@ -1,8 +1,8 @@
 # git-reverse.sh
-Reverses a git repo. Requires Bash 4 or newer.
+Reverses a git repo.
 
 ## Compatibility
-Should fail on Mac OS X (Bash 3).  Tested on Ubuntu 16.04.  YMMV.
+Requires Java 8. Tested on Ubuntu 16.04. YMMV.
 
 ## License
 BSD-2
@@ -40,17 +40,14 @@ git log --all --date-order --graph --decorate
 ## Example Output
 ```bash
 $ ./git-reverse.sh 
-be0923ece8f73281e5e54906c29debb852894b92 - Reversed 1 of 360 (0%)
-061bca59b29e75becbde66d2e510fc2b4059ccb2 - Reversed 2 of 360 (0%)
-6a19039e05e3a0186187d0a6943634e8499b5a65 - Reversed 3 of 360 (0%)
-7afe25e8caf93eb7107471a1bd078d4adc3f6999 - Reversed 4 of 360 (1%)
-8b556f6fe97c5357c2328467a5ba01b77931ff82 - Reversed 5 of 360 (1%)
-71fd0883975154f48059ca929db8ccb659c5049a - Reversed 6 of 360 (1%)
-[etc...]
-Switched to branch 'master'
-Your branch and 'origin/master' have diverged,
-and have 199 and 159 different commits each, respectively.
-  (use "git pull" to merge the remote branch into yours)
+756ffd0357b7dfc926ba2fb223c1fe5819fc686f - Reversed 165fe663762a6d6ca0e6bc2a59d38589c8d8db29 - 1 of 8 (12%)
+c8483866cf7960fb26f8e5dab1bacfb097c7ab4e - Reversed d59ba45ca49c49945b6425269808b5ddb5d8d414 - 2 of 8 (25%)
+0127863a53d594e0108dfb69994627209af4a71c - Reversed 68d6f9be6fbdf4e08a8244f043e634813e7d4948 - 3 of 8 (38%)
+ec35739efa3817760e4057bfa425105ecf899b1b - Reversed 6f5b160bc44f5951cc26a74c6b6911e3f6f3cfce - 4 of 8 (50%)
+72a6689242c697cf98843ff7c405b0deaa7da536 - Reversed 92a8fc10cc647b4eed47ce0878b6a76897ec6d55 - 5 of 8 (62%)
+a89ae14b948aa536f65d2112e82cbf3abef1cc36 - Reversed 7771be1cbe02d0e34baab788a55034f4079a2d81 - 6 of 8 (75%)
+1f92a0301852145f8f6b81cb520036f95ea722b0 - Reversed 0bcddcea9ec0252d9099f2c4b740185c0f1da654 - 7 of 8 (88%)
+aea136227f86e4d2a12aaa10130f00d538c7fdfd - Reversed eb4de78cec96b8279713e235e9a3fafb419dae9c - 8 of 8 (100%)
 
 *********************************************
 | Git repo successfully reversed!!! :-) (-: |
@@ -75,13 +72,13 @@ You have a full 'git clone --mirror' backup stored somewhere safe, right?
    
 **2. I tried to use this script to repair a repository corrupted by this script, and it worked, but all my commit-ids changed. Can you fix this?**
 
-   Send me a PR with the fix and I'll happily merge it. I suspect whitespace might be getting messed up in the metadata during the reversal, and so the commit-ids get perturbed. After 1 cycle of `git-reverse.sh` the commit-ids stabilize for all subsequent cycles, so there is some hope that this might be fixable.
+   Send me a PR with the fix and I'll happily merge it. I suspect whitespace might be getting messed up in the metadata during the reversal, and so the commit-ids get perturbed. There appears to be a 4-stage cycle using `git-reverse.sh` where commit-ids line up (e.g., commit-id's of the 4th run match the 8th run, 5th run match the 9th, etc) so there is some hope that this might be fixable.
    
-   Also, my script ignores anything in a commit message past the 30,000th character. That also causes that commit-id to change, as well as all subsequent commit-id's.  I'd welcome a PR that fixes that. We need to use a temporary file to hold the commit message to get around maximum command-length limitations.
+   Also, my script inserts the commit message "<empty-commit-message>" in the case where the raw commit object itself contains no commit message (CURSE YOU [git/git](https://github.com/git/git) COMMIT [296fdc53bdd75147](https://github.com/git/git/commit/296fdc53bdd75147) !!!). That also causes that commit-id to change, as well as all subsequent commit-id's.
    
-**3. I tried to reverse https://github.com/git/git, but it just hangs after processing 76,173 commits. What's going wrong?**
+**3. I tried to reverse https://github.com/git/git, but it just hangs after processing 46,173 commits. What's going wrong?**
 
-   For some reason the "git commit-tree" invocation hangs at that point.  I have no idea why.  Same for Atlassian's aui repo (after commit 14,378). But I was able to reverse [node.git](http://vm.bit-booster.com/bitbucket/projects/BB/repos/node_reversed/commits).  I've only tested with Git 2.7.4.  Maybe a different git version would fix this. But I really have no idea.
+   FIXED with the new Java version!!! :-D  (But you can invoke the script with "./git-reverse.sh bash" to use the buggy bash logic instead if you prefer this for some reason.)
 
 **4. My repo has a few orphan commits (aka root commits), and they are gone after the reversal. Where are they?**
 
