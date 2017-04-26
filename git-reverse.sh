@@ -36,6 +36,12 @@
 # of the authors and should not be interpreted as representing official policies,
 # either expressed or implied, of bit-booster.com
 
+export DIR=$(dirname $(readlink -f "$0"))
+if [ "$1" != "bash" ]; then
+  java -jar $DIR/git-reverse-*.jar
+  exit 0
+fi
+
 set -e
 
 unset P

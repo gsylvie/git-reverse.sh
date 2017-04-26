@@ -1,3 +1,37 @@
+/* com.bitbooster.git.Reverse
+
+Java code to reverse a git repo.
+https://bit-booster.com/doing-git-wrong/2017/03/30/howto-reverse-a-git-repo/
+
+YMMV - I only tested this on Ubuntu 16.04.
+
+Copyright (c) 2017, G. Sylvie Davies (sylvie@bit-booster.com)
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+The views and conclusions contained in the software and documentation are those
+of the authors and should not be interpreted as representing official policies,
+either expressed or implied, of bit-booster.com
+*/
 package com.bitbooster.git;
 
 import java.io.*;
@@ -18,7 +52,7 @@ public class Reverse {
     private static NumberFormat FORMAT = NumberFormat.getPercentInstance();
     private final static String PATTERN = "GO-GO-BIT-BOOSTER|%T|%H|%aI|%aE|%aN|%cI|%cE|%cN|%B".replace("|", "%x02");
 
-    public static void processCommitData(
+    private static void processCommitData(
             StringBuilder currentTokLine, StringBuilder currentBody,
             final Map<String, Set<String>> originalReversedParents,
             final Map<String, String> rewrittenHashes
@@ -34,7 +68,7 @@ public class Reverse {
         String commitTime = toks[6];
         String commitName = toks[7];
         String commitMail = toks[8];
-        String body = "";
+        String body;
         if (toks.length > 9) {
             body = toks[9] + currentBody.toString();
         } else {
@@ -80,12 +114,58 @@ public class Reverse {
             FINAL_COMMIT = commit;
             COUNT++;
             double d = (1.0 * COUNT) / TOTAL;
-            System.out.println(commit + " - Reversed " + commitId + " - " + COUNT + " of " + TOTAL + " (" + FORMAT.format(d) + "%)");
+            System.out.println(commit + " - Reversed " + commitId + " - " + COUNT + " of " + TOTAL + " (" + FORMAT.format(d) + ")");
         };
-        exec(cmd, env, hashUpdater);
+        exec(cmd, env, hashUpdater, false);
 
         currentTokLine.delete(0, currentTokLine.length());
         currentBody.delete(0, currentBody.length());
+    }
+
+    public static void rewriteRef(String prevRefLine, String currentRefLine, Map<String, String> h2h) {
+        String action = "action";
+        String[] toks = prevRefLine.split("\\s+");
+        String id = toks[0].trim();
+        String ref = toks[1].trim();
+
+        String[] newToks = currentRefLine.split("\\s+");
+        String newRef = newToks.length > 1 ? newToks[1].trim() : "";
+
+        boolean isTag = ref.startsWith("refs/tags/");
+        boolean keep = ref.startsWith("refs/tags/") && ref.endsWith("^{}");
+        if (!keep) {
+            keep = ref.startsWith("refs/heads/");
+        }
+        if (!keep) {
+            // Simple (un-annotated) tags should hit here:
+            keep = isTag && !newRef.endsWith("^{}");
+        }
+        if (!keep) {
+            return;
+        }
+        try {
+            String rewritten = h2h.get(id);
+            if (rewritten == null) {
+                System.out.println("WARNING: " + id + " (from " + ref + ") could not be mapped to a reversed commit.");
+                return;
+            } else {
+                rewritten = rewritten.trim();
+            }
+            if (isTag) {
+                ref = ref.substring("refs/tags/".length());
+                if (ref.endsWith("^{}")) {
+                    ref = ref.substring(0, ref.length() - 3).trim();
+                }
+                action = "tag";
+            } else {
+                ref = ref.substring("refs/heads/".length());
+                action = "branch";
+            }
+            String[] forceCmd = new String[]{"git", action, "-f", ref, rewritten};
+            exec(forceCmd, null, null, false);
+        } catch (Exception e) {
+            throw new RuntimeException("git " + action + " -f " + ref + " (rewritten:" + id + ") failed: " + e, e);
+        }
     }
 
     public static void main(String[] args) throws Exception {
@@ -141,48 +221,35 @@ public class Reverse {
 
         // Need to get off 'master' branch before we force-update all branches.
         cmd = new String[]{"git", "checkout", FINAL_COMMIT};
-        exec(cmd, null);
+        exec(cmd, true);
 
-        LineProcessor branchRewriter = line -> {
-            String[] toks = line.split("\\|");
-            String ref = toks[0];
-            String id = toks[1];
+        final StringBuilder prevRefLine = new StringBuilder();
+        LineProcessor refRewriter = line -> {
+            line = line.trim();
             try {
-                String rewritten = h2h.get(id.trim());
-                rewritten = rewritten.trim();
-                String[] forceBranch = new String[]{"git", "branch", "-f", ref, rewritten};
-                exec(forceBranch, null, null);
-            } catch (Exception e) {
-                throw new RuntimeException("git branch -f " + ref + " (rewritten:" + id + ") failed: " + e, e);
-            }
-        };
+                String prevLine = prevRefLine.toString();
+                if ("".equals(prevLine)) {
+                    return;
+                }
 
-        LineProcessor tagRewriter = line -> {
-            String[] toks = line.split("\\|");
-            String ref = toks[0];
-            String id = toks[1];
-            try {
-                String rewritten = h2h.get(id.trim());
-                rewritten = rewritten.trim();
-                String[] forceTag = new String[]{"git", "tag", "-f", ref, rewritten};
-                exec(forceTag, null, null);
-            } catch (Exception e) {
-                throw new RuntimeException("git tag -f " + ref + " (rewritten:" + id + ") failed: " + e, e);
+                rewriteRef(prevLine, line, h2h);
+
+            } finally {
+                prevRefLine.delete(0, prevRefLine.length());
+                prevRefLine.append(line);
             }
         };
 
 
-        cmd = new String[]{"git", "for-each-ref", "refs/heads", "--format=%(refname:short)|%(objectname)"};
-        exec(cmd, branchRewriter);
-
-        cmd = new String[]{"git", "for-each-ref", "refs/tags", "--format=%(refname:short)|%(objectname)"};
-        exec(cmd, tagRewriter);
+        cmd = new String[]{"git", "show-ref", "--dereference"};
+        exec(cmd, refRewriter);
+        rewriteRef(prevRefLine.toString(), "", h2h);
 
         cmd = new String[]{"git", "branch", "-f", "master", FINAL_COMMIT};
-        exec(cmd, null);
+        exec(cmd, false);
 
         cmd = new String[]{"git", "checkout", "master"};
-        exec(cmd, null);
+        exec(cmd, true);
 
         POOL.shutdown();
 
@@ -212,13 +279,18 @@ public class Reverse {
         String stderr;
     }
 
-    private static Run exec(String[] args, LineProcessor lp) throws Exception {
-        return exec(args, null, lp);
+    private static Run exec(String[] args, boolean ignoreErrors) throws Exception {
+        return exec(args, null, null, ignoreErrors);
     }
 
-    private static Run exec(String[] args, String[] env, LineProcessor lp) throws Exception {
+    private static Run exec(String[] args, LineProcessor lp) throws Exception {
+        return exec(args, null, lp, false);
+    }
+
+    private static Run exec(String[] args, String[] env, LineProcessor lp, boolean ignoreErrors) throws Exception {
 
         String cmd = Arrays.toString(args).replace(",", "");
+        // System.out.println(cmd);
 
         final Process p = Runtime.getRuntime().exec(args, env);
         final InputStream stdout = p.getInputStream();
@@ -236,11 +308,13 @@ public class Reverse {
         Run r = new Run();
         r.stdout = out.toString().trim();
         r.stderr = err.toString().trim();
-        if (exitCode != 0 || !"".equals(r.stderr.trim())) {
-            System.out.println("----------------------------------------------");
-            System.out.println("exit=" + exitCode + " for: " + cmd);
-            System.out.println("stdout=[" + r.stdout + "]");
-            System.out.println("stderr=[" + r.stderr + "]");
+        if (exitCode != 0) { // || !"".equals(r.stderr.trim())) {
+            if (!ignoreErrors) {
+                System.out.println("----------------------------------------------");
+                System.out.println("exit=" + exitCode + " for: " + cmd);
+                System.out.println("stdout=[" + r.stdout + "]");
+                System.out.println("stderr=[" + r.stderr + "]");
+            }
         }
         return r;
     }
