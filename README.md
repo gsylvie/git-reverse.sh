@@ -10,9 +10,7 @@ BSD-2
 ## Why?
 The primary usecase for this script is to repair repositories previously corrupted by this script.
 
-I considered using this script to prank my colleagues for April Fool's, but I chickened out.
-
-I actually own a real live chicken (a white silkie), and she also chickened out.
+"git log --follow" and "git blame" only go backwards, so you could use this script to make them go forwards.
 
 ## What Does It Do?
 
